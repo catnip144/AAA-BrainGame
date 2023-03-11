@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 
@@ -8,7 +7,7 @@ public class PlayerSetupControl : MonoBehaviour
     private int PlayerIndex, selectedCharIndex;
     private PlayerConfiguration playerConfig;
     [SerializeField] private Animator anim;
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Image statusIcon;
     [SerializeField] private Sprite ReadyIcon, WaitingIcon;
     [SerializeField] private TextMeshProUGUI PlayerText;
     [SerializeField] private GameObject Arrows;
@@ -55,7 +54,7 @@ public class PlayerSetupControl : MonoBehaviour
         PlayerText.text = $"P{PlayerIndex + 1}";
         PlayerText.color = GameManager.instance.PlayerColors[PlayerIndex];
 
-        Invoke("EnableInput", 1.5f);
+        Invoke("EnableInput", 0.4f);
     }
     private void EnableInput()
     {
@@ -77,7 +76,7 @@ public class PlayerSetupControl : MonoBehaviour
         
         playerConfig.IsReady = true;
         //anim.Play($"{selectedCharacterName}_Ready");
-        spriteRenderer.sprite = ReadyIcon;
+        statusIcon.sprite = ReadyIcon;
         Arrows.SetActive(false);
 
         PlayerConfigManager.instance.TryGameStart();

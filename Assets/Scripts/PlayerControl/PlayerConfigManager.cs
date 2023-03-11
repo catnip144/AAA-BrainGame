@@ -8,7 +8,7 @@ public class PlayerConfigManager : MonoBehaviour
 {
     public static PlayerConfigManager instance { get; private set; }
     private List<PlayerConfiguration> playerConfigs = new List<PlayerConfiguration>();
-    [SerializeField] private Transform mainLayout;
+    public List<PlayerConfiguration> PlayerConfigs => playerConfigs;
 
     void Awake()
     {
@@ -22,7 +22,11 @@ public class PlayerConfigManager : MonoBehaviour
         if (playerConfigs.All(p => p.IsReady == true))
         {
             Debug.Log("Starting Minigame...");
-            //SceneManager.LoadScene("MiniGame");
+            foreach(PlayerConfiguration config in playerConfigs) {
+                config.Input.transform.SetParent(null);
+                DontDestroyOnLoad(config.Input.gameObject);
+            }
+            SceneManager.LoadScene("MiniGame");
         }
     }
 
@@ -30,7 +34,7 @@ public class PlayerConfigManager : MonoBehaviour
     {
         if (!playerConfigs.Any(p => p.PlayerIndex == player_input.playerIndex)) {
             playerConfigs.Add(new PlayerConfiguration(player_input));
-            player_input.transform.SetParent(mainLayout);
+            player_input.transform.SetParent(GameObject.FindWithTag("MainLayout").transform);
             player_input.gameObject.GetComponent<PlayerSetupControl>().SetPlayer(playerConfigs[player_input.playerIndex]);
 
             Debug.Log($"Player {player_input.playerIndex + 1} Joined.");
