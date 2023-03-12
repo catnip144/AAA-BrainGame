@@ -7,6 +7,11 @@ public class PlayerLayout : MonoBehaviour
     [SerializeField] private List<RectTransform> playerPositions;
     void OnEnable()
     {
+        SetPlayersPosition();
+    }
+
+    private void SetPlayersPosition()
+    {
         for (int i = 0; i < PlayerConfigManager.instance.PlayerConfigs.Count; i++) {
             Transform currentPos = PlayerConfigManager.instance.PlayerConfigs[i].Input.gameObject.transform;
             currentPos.SetParent(transform);

@@ -3,38 +3,67 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputDetect : MonoBehaviour
 {
-    [SerializeField] PlayerSetupControl playerSetup;
-    [SerializeField] private int playerInputIndex;
-    public int PlayerInputIndex => playerInputIndex;
     private PlayerInput playerInput;
+    private PlayerSetupControl playerSetup;
+
+    [SerializeField] private int chosenAnswerIndex;
+    public int ChosenAnswerIndex => chosenAnswerIndex;
+
+    public int timePoint { get; private set; }
+    
+    private bool lockAnswer = true;
+    public bool LockAnswer => lockAnswer;
 
     void Start()
     {
         playerInput = GetComponent<PlayerInput>();
+        playerSetup = GetComponent<PlayerSetupControl>();
     }
 
     void Update()
     {
-        DetectInput();
+        SelectAnswer();
     }
 
-    private void DetectInput()
+    private void SelectAnswer()
     {
-        if (PlayerConfigManager.instance.PressKey(playerInput, InputType.SOUTHBUTTON))
+        if (playerSetup.IsGameMode && !lockAnswer)
         {
-            playerInputIndex = 0;
+            if (PlayerConfigManager.instance.PressKey(playerInput, InputType.SOUTHBUTTON))
+            {
+                chosenAnswerIndex = 0;
+            }
+            else if (PlayerConfigManager.instance.PressKey(playerInput, InputType.EASTBUTTON))
+            {
+                chosenAnswerIndex = 1;
+            }
+            else if (PlayerConfigManager.instance.PressKey(playerInput, InputType.NORTHBUTTON))
+            {
+                chosenAnswerIndex = 2;
+            }
+            else if (PlayerConfigManager.instance.PressKey(playerInput, InputType.WESTBUTTON))
+            {
+                chosenAnswerIndex = 3;
+            }
+
+            if (chosenAnswerIndex != -1)
+            {
+                lockAnswer = true;
+                playerSetup.SetPlayerStatus(lockAnswer);
+                // timePoint = (int) AnswerManger.instance.lefttime
+                if (AnswerManager.instance.CheckOtherPlayers())
+                    AnswerManager.instance.EvaluateAnswers();
+            }
         }
-        else if (PlayerConfigManager.instance.PressKey(playerInput, InputType.EASTBUTTON))
-        {
-            playerInputIndex = 1;
-        }
-        else if (PlayerConfigManager.instance.PressKey(playerInput, InputType.NORTHBUTTON))
-        {
-            playerInputIndex = 2;
-        }
-        else if (PlayerConfigManager.instance.PressKey(playerInput, InputType.WESTBUTTON))
-        {
-            playerInputIndex = 3;
-        }
+    }
+
+    public void ResetAnswerIndex()
+    {
+        chosenAnswerIndex = -1;
+    }
+
+    public void UnlockAnswerSelection()
+    {
+        lockAnswer = false;
     }
 }

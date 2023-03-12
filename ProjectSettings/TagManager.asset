@@ -48,3 +48,6 @@ TagManager:
   - name: Player
     uniqueID: 1480681655
     locked: 0
+  - name: Cover
+    uniqueID: 4230968313
+    locked: 0

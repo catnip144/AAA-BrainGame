@@ -4,15 +4,21 @@ using TMPro;
 
 public class PlayerSetupControl : MonoBehaviour
 {
-    private int PlayerIndex, selectedCharIndex;
+    private int selectedCharIndex;
     private PlayerConfiguration playerConfig;
+
     [SerializeField] private Animator anim;
+    public Animator PlayerAnim => anim;
+
     [SerializeField] private Image statusIcon;
     [SerializeField] private Sprite ReadyIcon, WaitingIcon;
     [SerializeField] private TextMeshProUGUI PlayerText;
     [SerializeField] private GameObject Arrows;
+
     private bool inputEnabled = false;
-    private string selectedCharacterName;
+    private bool isGameMode = false;
+    public bool IsGameMode => isGameMode;
+    public string SelectedCharacterName {get; private set; }
 
     void Update()
     {
@@ -21,6 +27,9 @@ public class PlayerSetupControl : MonoBehaviour
 
     private void UINavigation()
     {
+        if ((isGameMode) || (!inputEnabled))
+            return;
+
         int previousIndex = selectedCharIndex;
 
         if (PlayerConfigManager.instance.PressKey(playerConfig.Input, InputType.LEFT))
@@ -38,21 +47,21 @@ public class PlayerSetupControl : MonoBehaviour
         else if (PlayerConfigManager.instance.PressKey(playerConfig.Input, InputType.SOUTHBUTTON))
         {
             ReadyPlayer();
+            isGameMode = true;
             return;
         }
 
-        if (previousIndex == selectedCharIndex)
-            return;
-        selectedCharacterName = GameManager.instance.UnlockedCharacters[selectedCharIndex];
-        SetCharacter(selectedCharacterName);
+        if (previousIndex == selectedCharIndex) return;
+
+        SelectedCharacterName = GameManager.instance.UnlockedCharacters[selectedCharIndex];
+        SetCharacter(SelectedCharacterName);
     }
 
     public void SetPlayer(PlayerConfiguration config)
     {
         playerConfig = config;
-        PlayerIndex = config.PlayerIndex;
-        PlayerText.text = $"P{PlayerIndex + 1}";
-        PlayerText.color = GameManager.instance.PlayerColors[PlayerIndex];
+        PlayerText.text = $"P{config.PlayerIndex + 1}";
+        PlayerText.color = GameManager.instance.PlayerColors[config.PlayerIndex];
 
         Invoke("EnableInput", 0.4f);
     }
@@ -80,5 +89,13 @@ public class PlayerSetupControl : MonoBehaviour
         Arrows.SetActive(false);
 
         PlayerConfigManager.instance.TryGameStart();
+    }
+
+    public void SetPlayerStatus(bool hasChosenAnswer)
+    {
+        if (hasChosenAnswer)
+            statusIcon.sprite = ReadyIcon;
+        else
+            statusIcon.sprite = WaitingIcon;
     }
 }
