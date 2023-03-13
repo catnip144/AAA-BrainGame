@@ -328,8 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 996b3ee5fa1198040b943709860460bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSetup: {fileID: 160352562159010235}
-  chosenAnswerIndex: 0
+  chosenAnswerIndex: -1
 --- !u!114 &160352562159010235
 MonoBehaviour:
   m_ObjectHideFlags: 0

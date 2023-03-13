@@ -1,8 +1,8 @@
 using System.IO;
 using Random = UnityEngine.Random;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,9 +16,8 @@ public class GameManager : MonoBehaviour
     
     private int currentMiniGameIndex;
     private GameObject currentMinigame;
-    private MiniGameName miniGameName;
-    [SerializeField] private MiniGameSet allMiniGameSet;
-    [SerializeField] private List<OptionBundle> MiniGame2_Options = new List<OptionBundle>();
+    [SerializeField] private MiniGameSet miniGameClassification;
+
 
     void Awake()
     {
@@ -26,69 +25,82 @@ public class GameManager : MonoBehaviour
             return;
         instance = this;
     }
-
-    public void SetMiniGameType(MiniGameName gameType, Action continueGame)
-    {
-        miniGameName = gameType;
-        List<OptionBundle> possibleOptions = new List<OptionBundle>();
-
-        switch (miniGameName) {
-            case MiniGameName.MiniGame2:
-                possibleOptions = MiniGame2_Options;
-                break;
-            
-            default:
-                break;
-        }
-        AnswerManager.instance.SetPossibleImages(possibleOptions);
-        AnswerManager.instance.SetNextGameAction(continueGame);
-    }
-
+    
     public void NextMiniGame()
     {
+        Debug.Log($"MiniGame 유형 : {currentMiniGameIndex + 1}");
         AnswerManager.instance.TotalCanvas.alpha = 1;
 
         if (currentMiniGameIndex == 5) {
-            // Show Results
+            Debug.Log("게임 종료! 최종 결과 화면으로 이동합니다."); // Show Results
             currentMiniGameIndex = 0;
             return;
         }
 
+        Destroy(currentMinigame);
+        MiniGameName randomMiniGame = ReturnRandomMiniGame();
+        Tutorial.instance.ShowTutorial(SetMiniGame, randomMiniGame);
+
+        /*
+        1. interface 구현된 prefab
+        2. 튜토리얼 보여줄 것이고
+        3. 튜토리얼 확인 누를 시 문제를 실행
+        4. 문제 실행이 끝나면 AnswerManager SetCorrectAnswer(answer) 호출
+        */
+    }
+    private MiniGameName ReturnRandomMiniGame()
+    {
         List<MiniGameName> miniGameList = new List<MiniGameName>();
 
         switch (currentMiniGameIndex) {
-            case 0:
-                miniGameList = allMiniGameSet.SenseType;
-                break;
             case 1:
-                miniGameList = allMiniGameSet.MemorizeType;
+                miniGameList = miniGameClassification.SenseType;
+                break;
+            case 0: // 테스트를 위한 임시방편, 원래는 1
+                miniGameList = miniGameClassification.MemorizeType;
                 break;
             case 2:
-                miniGameList = allMiniGameSet.AnalyzeType;
+                miniGameList = miniGameClassification.AnalyzeType;
                 break;
             case 3:
-                miniGameList = allMiniGameSet.CalculateType;
+                miniGameList = miniGameClassification.CalculateType;
                 break;
             case 4:
-                miniGameList = allMiniGameSet.VisualizeType;
+                miniGameList = miniGameClassification.VisualizeType;
                 break;
             default:
                 break;
         }
-        int randomIndex = Random.Range(0, miniGameList.Count);
-        MiniGameName minigame = miniGameList[randomIndex];
+        int randomIndex = Random.Range(0, miniGameList.Count);       
+        return miniGameList[randomIndex];
+    }
 
-        Destroy(currentMinigame);
-        // Instantiate MiniGame Prefab
-        // Get Interface. Function
-        // SetMiniGameType(minigame, )
-
-        // interface 구현된 prefab 쪽에서
-        // 튜토리얼 자동으로 보여줄 것이고
-        // 튜토리얼 확인 누를 시 문제를 실행
-        // 문제 실행이 끝나면 AnswerManager SetCorrectAnswer(answer) 호출
-
+    private void SetMiniGame(MiniGameName inputGameName)
+    {
         currentMiniGameIndex += 1;
+        MiniGameInfo targetGameInfo = null;
+
+        var allMiniGames = Resources.LoadAll<MiniGameInfo>("MiniGame/");
+        foreach (MiniGameInfo miniGame in allMiniGames) {
+            if (miniGame.miniGameName == inputGameName) {
+                targetGameInfo = miniGame;
+                break;
+            }
+        }
+
+        if (targetGameInfo == null) {
+            Debug.LogError($"MiniGame : {inputGameName} could not be loaded.");
+            return;
+        }
+
+        currentMinigame = Instantiate(targetGameInfo.MiniGamePrefab, AnswerManager.instance.miniGameSpawn);
+        
+        if (targetGameInfo.possibleOptions.Count > 0)
+            AnswerManager.instance.SetPossibleImages(targetGameInfo.possibleOptions);
+        
+        MiniGameInterface miniGameInterface = currentMinigame.GetComponent<MiniGameInterface>();
+        AnswerManager.instance.SetNextGameAction(miniGameInterface.ReturnContinueGame());
+        AnswerManager.instance.ShowProblem();
     }
 }
 
@@ -97,7 +109,7 @@ public enum MiniGameName {
     // MemorizeType
     // AnalyzeType
     CrocGame, // CalculateType
-    MiniGame2 // VisualizeType
+    // VisualizeType
 }
 
 [System.Serializable]

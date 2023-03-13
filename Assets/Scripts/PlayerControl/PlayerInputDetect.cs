@@ -18,6 +18,7 @@ public class PlayerInputDetect : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         playerSetup = GetComponent<PlayerSetupControl>();
+        chosenAnswerIndex = -1;
     }
 
     void Update()

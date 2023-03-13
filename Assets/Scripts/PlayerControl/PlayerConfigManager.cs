@@ -23,7 +23,7 @@ public class PlayerConfigManager : MonoBehaviour
     {
         if (playerConfigs.All(p => p.IsReady == true))
         {
-            Debug.Log("Starting Minigame...");
+            Debug.Log("미니게임 준비 중...");
             DOTween.Rewind("ShowBoard");
             DOTween.Play("ShowBoard");
 
@@ -36,17 +36,18 @@ public class PlayerConfigManager : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
 
         foreach(PlayerConfiguration config in playerConfigs) {
+            config.PlayerSetup.SetPlayerStatus(false);
             config.Input.transform.SetParent(null);
             DontDestroyOnLoad(config.Input.gameObject);
         }
-
         DOTween.Rewind("HideBoard");
         DOTween.Play("HideBoard");
-        SceneManager.LoadScene("MiniGame");
 
-        //yield return new WaitForSeconds(1f);
-        
-        //GameManager.instance.NextMiniGame();
+        var process = SceneManager.LoadSceneAsync("MiniGame");
+        process.completed += (AsyncOperation operation) =>
+        {
+            GameManager.instance.NextMiniGame();
+        };
     }
 
     public void HandlePlayerJoin(PlayerInput player_input)
@@ -58,7 +59,7 @@ public class PlayerConfigManager : MonoBehaviour
             player_input.transform.SetParent(GameObject.FindWithTag("MainLayout").transform);
             player.PlayerSetup.SetPlayer(playerConfigs[player_input.playerIndex]);
 
-            Debug.Log($"Player {player_input.playerIndex + 1} Joined.");
+            Debug.Log($"Player {player_input.playerIndex + 1}이 참여했습니다.");
         }
     }
     public bool PressKey(PlayerInput pi, string input_tag)
