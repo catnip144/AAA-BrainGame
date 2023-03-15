@@ -23,7 +23,7 @@ public class PlayerConfigManager : MonoBehaviour
     {
         if (playerConfigs.All(p => p.IsReady == true))
         {
-            Debug.Log("미니게임 준비 중...");
+            Debug.Log("Preparing MiniGame...");
             DOTween.Rewind("ShowBoard");
             DOTween.Play("ShowBoard");
 
@@ -59,7 +59,7 @@ public class PlayerConfigManager : MonoBehaviour
             player_input.transform.SetParent(GameObject.FindWithTag("MainLayout").transform);
             player.PlayerSetup.SetPlayer(playerConfigs[player_input.playerIndex]);
 
-            Debug.Log($"Player {player_input.playerIndex + 1}이 참여했습니다.");
+            Debug.Log($"Player {player_input.playerIndex + 1} Joined.");
         }
     }
     public bool PressKey(PlayerInput pi, string input_tag)

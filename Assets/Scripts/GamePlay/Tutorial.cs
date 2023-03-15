@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Tutorial : MonoBehaviour
 {
+    [SerializeField] private GameObject tutorialUI;
     public static Tutorial instance { get; private set; }
     public void Awake()
     {
@@ -19,8 +20,9 @@ public class Tutorial : MonoBehaviour
     {
         if (isTutorial && CheckUnderstood()) {
             isTutorial = false;
+            tutorialUI.SetActive(false);
             proceedMiniGame?.Invoke(gameName);
-            Debug.Log("미니게임으로 이동합니다.");
+            Debug.Log("Starting MiniGame.");
         }
     }
     public void ShowTutorial(Action<MiniGameName> proceed_minigame, MiniGameName game_name)
@@ -28,7 +30,8 @@ public class Tutorial : MonoBehaviour
         proceedMiniGame = proceed_minigame;
         gameName = game_name;
         isTutorial = true;
-        Debug.Log("튜토리얼 중...");
+        tutorialUI.SetActive(true);
+        Debug.Log("Playing Tutorial...");
     }
 
     private bool CheckUnderstood()

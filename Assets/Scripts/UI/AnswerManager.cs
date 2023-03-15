@@ -177,14 +177,14 @@ public class AnswerManager : MonoBehaviour
 
         // Instantiate(RewardPoint)
         player.PlayerScore += 10; // += player.InputDetect.timePoint;
-        Debug.Log($"Player {player.PlayerIndex + 1} 정답입니다!");
+        Debug.Log($"Player {player.PlayerIndex + 1} is Correct!");
     }
 
     private void IncorrectPlayer(PlayerConfiguration player)
     {
         //psc.PlayerAnim.Play(psc.SelectedCharacterName + "_Sad");
         //psc.SetStatus
-        Debug.Log($"Player {player.PlayerIndex + 1} 는 오답입니다.");
+        Debug.Log($"Player {player.PlayerIndex + 1} got it wrong.");
     }
 
     public void ShowProblem()

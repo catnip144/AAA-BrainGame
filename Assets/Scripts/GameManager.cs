@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     
     public void NextMiniGame()
     {
-        Debug.Log($"MiniGame 유형 : {currentMiniGameIndex + 1}");
+        Debug.Log($"MiniGame Type : {currentMiniGameIndex + 1}");
         AnswerManager.instance.TotalCanvas.alpha = 1;
 
         if (currentMiniGameIndex == 5) {
